@@ -9,6 +9,24 @@ type Todo struct {
 	done        bool
 }
 
+func (todo *Todo) toggle() *Todo {
+	todo.done = !todo.done
+
+	return todo
+}
+
+func (todo *Todo) setName(name string) *Todo {
+	todo.name = name
+
+	return todo
+}
+
+func (todo *Todo) setDescription(description string) *Todo {
+	todo.description = description
+
+	return todo
+}
+
 func findById(todos []Todo, id int) *Todo {
 	for i := 0; i < len(todos); i++ {
 		if todos[i].id == id {
@@ -29,6 +47,11 @@ func main() {
 	}
 
 	todos = append(todos, todo)
+	oldTodo := findById(todos, 1)
+	oldTodo.toggle().setDescription("Estudei Go").setName("Estudando Go")
+	findById(todos, 1)
 
-	fmt.Println(findById(todos, 1))
+	fmt.Println(&todo.id)
+	fmt.Println(&todos[0].id)
+	fmt.Println(&oldTodo.id)
 }
