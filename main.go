@@ -1,57 +1,29 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
 
-type Todo struct {
-	id          int
-	name        string
-	description string
-	done        bool
-}
+	"github.com/luweslen/to-go-list/internal/app"
+)
 
-func (todo *Todo) toggle() *Todo {
-	todo.done = !todo.done
-
-	return todo
-}
-
-func (todo *Todo) setName(name string) *Todo {
-	todo.name = name
-
-	return todo
-}
-
-func (todo *Todo) setDescription(description string) *Todo {
-	todo.description = description
-
-	return todo
-}
-
-func findById(todos []Todo, id int) *Todo {
-	for i := 0; i < len(todos); i++ {
-		if todos[i].id == id {
-			return &todos[i]
-		}
-	}
-	return nil
-}
+type Todo = app.Todo
 
 func main() {
 	todos := []Todo{}
 
 	todo := Todo{
-		id:          1,
-		name:        "Estudar Go",
-		description: "Vamos estudar Go",
-		done:        false,
+		Id:          1,
+		Name:        "Estudar Go",
+		Description: "Vamos estudar Go",
+		Done:        false,
 	}
 
 	todos = append(todos, todo)
-	oldTodo := findById(todos, 1)
-	oldTodo.toggle().setDescription("Estudei Go").setName("Estudando Go")
-	findById(todos, 1)
+	oldTodo := app.FindById(todos, 1)
+	oldTodo.Toggle().SetDescription("Estudei Go").SetName("Estudando Go")
+	app.FindById(todos, 1)
 
-	fmt.Println(&todo.id)
-	fmt.Println(&todos[0].id)
-	fmt.Println(&oldTodo.id)
+	fmt.Println(&todo.Id)
+	fmt.Println(&todos[0].Id)
+	fmt.Println(&oldTodo.Id)
 }
