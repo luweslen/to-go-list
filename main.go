@@ -6,7 +6,9 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/luweslen/to-go-list/internal/app"
-	_ "github.com/mattn/go-sqlite3"
+
+	// _ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 )
 
 type Todo = app.Todo
@@ -22,7 +24,7 @@ func loadEnv() {
 
 func initDB() {
 	var err error
-	DB, err = sql.Open("sqlite3", "./app.db") // Open a connection to the SQLite database file named app.db
+	DB, err = sql.Open("sqlite", "./app.db") // Open a connection to the SQLite database file named app.db
 	if err != nil {
 		log.Fatal(err) // Log an error and stop the program if the database can't be opened
 	}
@@ -42,6 +44,20 @@ func initDB() {
 	}
 }
 
+func SaveTodo(todo Todo, DB *sql.DB) Todo {
+	sqlSave := `INSERT INTO todos (title, description, done) VALUES (?, ?, ?)`
+	result, err := DB.Exec(sqlSave, todo.Name, todo.Description, todo.Done)
+	if err != nil {
+		log.Print(err)
+	}
+	id, err := result.LastInsertId()
+	if err != nil {
+		log.Print(err)
+	}
+	todo.Id = id
+	return todo
+}
+
 func main() {
 	loadEnv()
 	initDB()
@@ -54,6 +70,10 @@ func main() {
 		Description: "Vamos estudar Go",
 		Done:        false,
 	}
+
+	result := SaveTodo(todo, DB)
+	log.Print(result)
+	log.Print(todo)
 
 	todos = append(todos, todo)
 	oldTodo := app.FindById(todos, 1)
