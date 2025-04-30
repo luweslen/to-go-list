@@ -58,11 +58,48 @@ func SaveTodo(todo Todo, DB *sql.DB) Todo {
 	return todo
 }
 
+func todoMapper(row *sql.Row) (Todo, error) {
+
+	var t Todo
+	err := row.Scan(&t.Id, &t.Name, &t.Description, &t.Done)
+	if err != nil {
+		return t, err
+	}
+	return t, nil
+
+}
+
+func GetTodoById(todoId int64, DB *sql.DB) (Todo, error) {
+	sqlGetById := `SELECT id, title, description, done FROM todos WHERE id = ?`
+	row := DB.QueryRow(sqlGetById, todoId)
+	return todoMapper(row)
+}
+
+func GetTodos(DB *sql.DB) ([]Todo, error) {
+	sqlGetAll := `SELECT id, title, description, done FROM todos`
+	rows, err := DB.Query(sqlGetAll)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var todos []Todo
+	for rows.Next() {
+		var t Todo
+		if err := rows.Scan(&t.Id, &t.Name, &t.Description, &t.Done); err != nil {
+			return nil, err
+		}
+		todos = append(todos, t)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+	return todos, nil
+}
+
 func main() {
 	loadEnv()
 	initDB()
-
-	todos := []Todo{}
 
 	todo := Todo{
 		Id:          1,
@@ -72,15 +109,22 @@ func main() {
 	}
 
 	result := SaveTodo(todo, DB)
-	log.Print(result)
-	log.Print(todo)
+	log.Print("Teste", result)
 
-	todos = append(todos, todo)
-	oldTodo := app.FindById(todos, 1)
-	oldTodo.Toggle().SetDescription("Estudei Go").SetName("Estudando Go")
-	app.FindById(todos, 1)
+	fetched, err := GetTodoById(9, DB)
+	if err != nil {
+		log.Print("Erro ao buscar todo:", err)
+	}
+	log.Print("Todo encontrado:", fetched)
 
-	log.Print(&todo.Id)
-	log.Print(&todos[0].Id)
-	log.Print(&oldTodo.Id)
+	allTodos, err := GetTodos(DB)
+	if err != nil {
+		log.Print("Erro ao buscar todos:", err)
+	}
+	log.Print("Todos encontrados:", allTodos)
+
+	var teste = fetched.Toggle()
+	teste2 := SaveTodo(*teste, DB)
+	log.Print("Teste", teste2)
+
 }
