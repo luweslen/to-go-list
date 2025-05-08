@@ -38,4 +38,14 @@ func main() {
 	teste2 := repository.Create(*teste)
 	log.Print("Teste", teste2)
 
+	repository.Delete(teste.Id)
+
+	todos, err := repository.GetAll()
+
+	if err != nil {
+		log.Print("Erro ao buscar todos:", err)
+	}
+
+	log.Print("Todos encontrados:", todos)
+
 }

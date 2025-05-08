@@ -1,6 +1,7 @@
 package sqlite
 
 import (
+	"database/sql"
 	"log"
 
 	"github.com/luweslen/to-go-list/internal/domain/entities"
@@ -28,6 +29,18 @@ func (TodoRepository) Create(todo entities.Todo) entities.Todo {
 	return todo
 }
 
+func (TodoRepository) Delete(todoId int64) sql.Result {
+	sqlDelete := `DELETE FROM todos WHERE id = ?`
+
+	result, err := DB.Exec(sqlDelete, todoId)
+
+	if err != nil {
+		log.Print(err)
+	}
+
+	return result
+}
+
 func (TodoRepository) GetById(todoId int64) (entities.Todo, error) {
 	sqlGetById := `SELECT id, title, description, done FROM todos WHERE id = ?`
 
@@ -38,22 +51,20 @@ func (TodoRepository) GetById(todoId int64) (entities.Todo, error) {
 
 func (TodoRepository) GetAll() ([]entities.Todo, error) {
 	sqlGetAll := `SELECT id, title, description, done FROM todos`
+
 	rows, err := DB.Query(sqlGetAll)
+
 	if err != nil {
 		return nil, err
 	}
+
 	defer rows.Close()
 
-	var todos []entities.Todo
-	for rows.Next() {
-		var t entities.Todo
-		if err := rows.Scan(&t.Id, &t.Name, &t.Description, &t.Done); err != nil {
-			return nil, err
-		}
-		todos = append(todos, t)
-	}
+	todos, err := todosFromDB(rows)
+
 	if err := rows.Err(); err != nil {
 		return nil, err
 	}
+
 	return todos, nil
 }

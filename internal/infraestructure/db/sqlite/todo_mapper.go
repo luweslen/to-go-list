@@ -17,3 +17,17 @@ func todoFromDB(row *sql.Row) (entities.Todo, error) {
 
 	return t, nil
 }
+
+func todosFromDB(rows *sql.Rows) ([]entities.Todo, error) {
+	var todos []entities.Todo
+
+	for rows.Next() {
+		var t entities.Todo
+		if err := rows.Scan(&t.Id, &t.Name, &t.Description, &t.Done); err != nil {
+			return nil, err
+		}
+		todos = append(todos, t)
+	}
+
+	return todos, nil
+}
