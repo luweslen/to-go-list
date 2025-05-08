@@ -20,32 +20,18 @@ func main() {
 	repository := sqlite.TodoRepository{}
 
 	result := repository.Create(todo)
-	log.Print("Teste", result)
 
-	fetched, err := repository.GetById(9)
+	result.Toggle()
+	result.Name = "Alterado"
+
+	repository.Update(result.Id, result)
+
+	todo2, err := repository.GetAll()
+
 	if err != nil {
 		log.Print("Erro ao buscar todo:", err)
 	}
-	log.Print("Todo encontrado:", fetched)
 
-	allTodos, err := repository.GetAll()
-	if err != nil {
-		log.Print("Erro ao buscar todos:", err)
-	}
-	log.Print("Todos encontrados:", allTodos)
-
-	var teste = fetched.Toggle()
-	teste2 := repository.Create(*teste)
-	log.Print("Teste", teste2)
-
-	repository.Delete(teste.Id)
-
-	todos, err := repository.GetAll()
-
-	if err != nil {
-		log.Print("Erro ao buscar todos:", err)
-	}
-
-	log.Print("Todos encontrados:", todos)
+	log.Print("Todos encontrado:", todo2)
 
 }

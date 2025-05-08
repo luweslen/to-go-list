@@ -41,6 +41,18 @@ func (TodoRepository) Delete(todoId int64) sql.Result {
 	return result
 }
 
+func (TodoRepository) Update(id int64, todo entities.Todo) sql.Result {
+	sqlUpdate := `UPDATE todos SET title = ?, description = ?, done = ? WHERE id = ?`
+
+	result, err := DB.Exec(sqlUpdate, todo.Name, todo.Description, todo.Done, todo.Id)
+
+	if err != nil {
+		log.Print(err)
+	}
+
+	return result
+}
+
 func (TodoRepository) GetById(todoId int64) (entities.Todo, error) {
 	sqlGetById := `SELECT id, title, description, done FROM todos WHERE id = ?`
 
